@@ -9,3 +9,4 @@
 - Model assumptions beside normal distribution?
 - How to check for outliers with methods other than lin. reg.?
 - How to factorize categorical data (i.o. to work with algorithms supporting numerical data only)? -> factors?
+- "Ratio of raw data"?

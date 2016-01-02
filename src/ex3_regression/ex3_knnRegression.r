@@ -13,7 +13,9 @@ print(College)
 
 responseColNames 	= c("Apps")
 CollegeWOResponse	= College[,!(names(College) %in% responseColNames)]
-
+prvtContrasts = contrasts(factor(College$Private))
+print(prvtContrasts)
+print(prvtContrasts[1])
 
 # Apply KNN with leave-one-out cross-validation.
 knn.reg(CollegeWOResponse, test = NULL, y = College$Apps, k = 3)
