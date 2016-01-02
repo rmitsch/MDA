@@ -1,0 +1,4 @@
+1. Check for appropriateness of model assumpations
+2. Fit model
+3. Identify outliers
+4. Evaluate quality of result

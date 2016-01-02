@@ -1,0 +1,11 @@
+- Data splitting/cross validation for regression?
+- How to compare diff. approaches (e.g. regression tree and lin. reg.)?
+- Which dataset for classficiation?
+- Documentation/presentation how?
+- Derived predictors -> ?
+- Local polynomial regression <-> LOESS?
+- Why compute model w/o highly significant columns?
+- LOESS with categorical variables?
+- Model assumptions beside normal distribution?
+- How to check for outliers with methods other than lin. reg.?
+- How to factorize categorical data (i.o. to work with algorithms supporting numerical data only)? -> factors?

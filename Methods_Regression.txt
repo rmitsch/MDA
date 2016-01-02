@@ -4,25 +4,22 @@
 
 linear Regression (+ various tests)
 	Transformations
-	Splines
 	Indicator variables
 
 general linear model
 
 regression smoothing
-naive regression
-piecewise linear/constant regression
-local polynomial regression
-LOESS (local weighted estimate)
-
-k-NN regression
-
-(natural) cubic splines
-
+	- naive regression
+	- piecewise linear/constant regression
+	- local polynomial regression
+	- LOESS (local weighted estimate)
+	- k-NN regression
+	- (natural) cubic Splines
+	
 robust regression
 
-regression tree
-post & pre pruning
+x regression tree
+	- post & pre pruning
 
 ############
 #Compare different methods:
