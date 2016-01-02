@@ -1,0 +1,42 @@
+############
+#Regression Methods:
+##########
+
+linear Regression (+ various tests)
+	Transformations
+	Splines
+	Indicator variables
+
+general linear model
+
+regression smoothing
+naive regression
+piecewise linear/constant regression
+local polynomial regression
+LOESS (local weighted estimate)
+
+k-NN regression
+
+(natural) cubic splines
+
+robust regression
+
+regression tree
+post & pre pruning
+
+############
+#Compare different methods:
+##########
+
+# Model selection
+Mallows CP
+PRESS
+BIC
+AIC
+standardized & studentized residuals error
+
+
+# influential datapoints
+DFBETAS
+DFFITS
+

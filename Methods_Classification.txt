@@ -1,0 +1,49 @@
+Bayes Rule (mit prior)
+Max-Likelihood Rule (ohne prior)
+LDA (same covariance for all groups)
+	Fisher Discriminant
+QDA (individual covariances per group)
+RDA 
+Naive Bayes (assumes conditionally independent variables, good for 	curse of dimensionality)
+	non-/parametric density distributions
+
+Decision trees
+	Measures:
+		entropy
+		info gain
+		gini index
+		gini criterion
+		towing criterion
+		cost-complexity criterion
+	pre-/post pruning
+
+Analysis:
+	ROC curves
+	Confusion matrix
+
+Test:
+	Data splitting
+	CV
+
+k-nn (bad for curse of dimensionality)
+
+Logistic Regression (binary classification)
+Naive Regression?
+Simple Logistic Regression
+	Can be specified as general lin. model (code in slides)
+	Transformations:
+		logit (normal)
+			> res.logit <- glm(claim ~ age, 			family=binomial)
+			> summary(res.logit)
+		probit
+			> res.probit <- glm(claim ~ age, 
+			family=binomial(link="probit"))
+		cloglog
+
+Äquivalenz gruppiert/ungruppiert ?
+Multiple logistic regression (code in slides, also if dividing in 		groups makes sense, eg. gender)
+
+GLM 
+Testing models: Max. likelihood ratio
+	Deviance
+	ANOVA & R^2
