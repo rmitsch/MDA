@@ -1,0 +1,17 @@
+
+# http://stackoverflow.com/questions/17200114/how-to-split-data-into-training-testing-sets-using-sample-function-in-r-program
+
+dataAll <- Default
+
+## 25% the data become test
+smp_size <- floor(0.25 * nrow(dataAll))
+
+set.seed(0)
+train_ind <- sample(seq_len(nrow(dataAll)), size = smp_size)
+
+
+### Training Data
+data <- dataAll[train_ind, ]
+
+## test data
+dataTest <- dataAll[-train_ind, ]

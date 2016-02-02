@@ -1,0 +1,84 @@
+################
+##	MDA WS 15/16
+##	Linhardt, Mitsch, Schwarzl
+##	Exercise 3 linear regression
+################
+
+# can use data which contains cleaned version of College
+
+library(ISLR)
+
+## . takes all columns not used on the left side
+data.reg <- lm(data$Apps~., data=data)
+summary(data.reg)
+
+
+# test indikator variables:
+#additive term is by default on PrivateYes, multiplicative was significant for Accept & Room.Board
+data.reg <- lm(data$Apps ~ Private + Accept + Top25perc + Outstate + Room.Board + PhD + Expend + Grad.Rate + Accept:Private + Top25perc:Private + Outstate:Private + Room.Board:Private + PhD:Private + Expend:Private + Grad.Rate:Private, data=data)
+
+
+
+#remove insignificant ones
+data.regBig <- lm(data$Apps ~ Private + Accept + Top25perc + Outstate + Room.Board + PhD + Expend + Grad.Rate + Accept:Private + Room.Board:Private, data=data)
+
+data.regSmall <- lm(data$Apps ~ Accept + Top25perc + Room.Board + Expend + Accept:Private, data=data)
+
+
+data.regSmall <- lm(data$Apps ~ Accept + Top25perc + Room.Board:Private, data=data)
+
+
+#test if smaller model is enough
+anova(data.regSmall,data.regBig)
+# decide to omit variables
+# alpha = 0.95 seems to be enough here
+
+
+
+# TODO University of Missouri at Rolla -> high leverage
+#Transformations -> family parameter
+data.reg <- glm(data$Apps ~ Accept + Top25perc + Room.Board:Private, data=data,family=gaussian(link="log"))
+
+# cook's is worse now
+plot(data.reg)
+
+
+#
+#outlier:
+#                                Private Apps Accept Top25perc Outstate
+#University of Missouri at Rolla      No 1877   1826        77     9057
+#                                Room.Board PhD Expend Grad.Rate
+#University of Missouri at Rolla       3600  88   9699        49
+#
+#                  Private Apps Accept Top25perc Outstate Room.Board PhD Expend
+#Loyola University     Yes 1891   1698        80    11100       5870  77   9456
+#                  Grad.Rate
+#Loyola University        53
+#                         Private Apps Accept Top25perc Outstate Room.Board PhD
+#Arkansas Tech University      No 1734   1729        52     3460       2650  57
+#                         Expend Grad.Rate
+#Arkansas Tech University   4739        48
+
+
+
+# TODO - I don't know what this is
+#plots based on Example Multiple Regression 2.r by Marcus Hudec
+hi  <- lm.influence(data.reg)$hat     
+mean(hi)
+length(hi)
+
+
+plot(hi, type="h", main="Diagonal Values of Hat-Matrix")
+abline(h=mean(hi), col="grey")
+abline(h=2*mean(hi), col="red", lty=2, lwd=2)
+abline(h=3*mean(hi), col="red", lwd=2)
+
+
+#dffits(res)
+plot(dffits(data.regSmall), type="h", main="DFFITS")
+abline(h=2*sqrt(length(data.reg$coef)/length(hi)), col="red", lty=2, lwd=2)
+abline(h=-2*sqrt(length(data.reg$coef)/length(hi)), col="red", lty=2, lwd=2)
+
+#cooks.distance(res)
+plot(cooks.distance(data.reg), type="h", main="Cooks Distance")
+abline(h=4/length(hi), col="red", lty=2, lwd=2)

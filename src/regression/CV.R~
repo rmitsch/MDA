@@ -1,0 +1,148 @@
+################
+##	MDA WS 15/16
+##	Linhardt, Mitsch, Schwarzl
+##	Exercise 3 Cross Validation
+################
+
+#This script performs model selection over all used techniques via CV on the 
+# training set. The performance of the best model is validated on a hold-out
+# test set that has never been used in the previous process.
+
+source("preProcessing.R")
+
+library(ISLR)
+library("rpart")
+library(FNN)
+library(MASS)
+library(caret)
+library(ROCR)
+library(Metrics)
+library(mgcv)
+library(gamclass)
+library(locfit)
+
+#Convert binary col to numeric, as this knn implementation cannot deal with mixed data-types
+dataNumeric <- data
+privateData = data$Private
+privateData = gsub("Yes", "1", privateData)
+privateData = gsub("No", "0", privateData)
+dataNumeric$Private = as.numeric(privateData)
+
+numberOfModels <- 10
+
+correct <- v[0]
+correctAll <- v[0]
+results <- vector("list", numberOfModels )
+methodNames <- v[0]
+
+for( i in 1:10 ){	# For each fold (fold i is the test set)	
+	# Create training and test set
+	testSetN <- dataNumeric[ folds[[i]], ]
+	testSet <- data[ folds[[i]], ]
+	testSetAll <- dataAll[ foldsAll[[i]], ]
+
+	firstTrainingFold<-0
+	if( (i!=1) ){
+		trainingSetN <- dataNumeric[ folds[[1]], ]
+		trainingSet <- data[ folds[[1]], ]
+		trainingSetAll <- dataAll[ foldsAll[[1]], ]
+		firstTrainingFold<-1
+	}else{
+		trainingSetN <- dataNumeric[ folds[[2]], ]
+		trainingSet <- data[ folds[[2]], ]
+		trainingSetAll <- dataAll[ foldsAll[[2]], ]
+		firstTrainingFold<-2
+	}
+	for(j in 1:10){ #unify training folds
+		if(i!=j && j!=firstTrainingFold){
+			trainingSetN<- rbind(trainingSetN,dataNumeric[ folds[[j]], ])
+			trainingSet<- rbind(trainingSet,data[ folds[[j]], ])
+			trainingSetAll <- rbind(trainingSetAll,dataAll[ foldsAll[[j]], ])
+		}
+	}
+
+	#Build models and predict
+	trainingSetNWithoutClass= trainingSetN[,!(names(trainingSetN) %in% c("Apps"))]
+	testSetNWithoutClass= testSetN [,!(names(testSetN ) %in% c("Apps"))]
+	correct <- c(correct ,testSet$Apps)
+	correctAll <- c(correctAll ,testSetAll$Apps)
+
+
+	#knn
+	knn <- knn.reg(trainingSetN, y=trainingSetN$Apps, test=testSetN, k = 5)
+	results[[1]] <- c(results[[1]],knn$pred)
+	methodNames[1] <- "k-nn"		
+
+	#Cubic Spline
+	data.splines = gam(Apps ~ 	Private+Accept+Top25perc++Outstate+
+					Room.Board+PhD+Expend+Grad.Rate, 
+					data=trainingSetN)
+	results[[2]] <- c(results[[2]],predict(data.splines, testSetNWithoutClass))
+	methodNames[2] <- "Cubic Spline"
+
+	#Linear Regression (The small model)
+	data.regSmall <- lm(trainingSet$Apps ~ Accept + Top25perc + Room.Board:Private, data=trainingSet)
+	results[[3]] <- c(results[[3]],predict(data.regSmall , testSet))
+	methodNames[3] <- "Linear Regression"
+
+	#LOESS
+	yT <- locfit(trainingSetN$Apps ~ Accept + Top25perc + Room.Board:Private,alpha=0.4,deg=2, data=trainingSetN)
+	results[[4]] <- c(results[[4]], predict(yT,testSetN))
+	methodNames[4] <- "LOESS"
+
+	#Regression Tree
+	fit = rpart(trainingSet$Apps~., data=trainingSet, method="anova")
+	pfit = prune(fit, fit$cptable[which.min(fit$cptable[,"xerror"]),"CP"])
+	preds.rpart <- predict(pfit , newdata= testSet)
+	results[[5]] <- c(results[[5]],preds.rpart)	
+	methodNames[5] <- "Regression Tree"
+
+	#Robust M-Estimator with Huber-Weight
+	hubert <- rlm(trainingSetAll$Apps~., data=trainingSetAll)
+	results[[6]] <- c(results[[6]], predict(hubert,newdata=testSetAll))	
+	methodNames[6] <- "Robust M-Estimator with Huber-Weight"
+
+	# Robust M-Estimator with Bisquare-Weight
+	bisquare <- rlm(trainingSetAll$Apps~., data=trainingSetAll, method="MM")
+	results[[7]] <- c(results[[7]], predict(bisquare,newdata=testSetAll))	
+	methodNames[7] <- "Robust M-Estimator with Bisquare-Weight"
+	
+	# LTS-FIT
+	lts <- lqs(trainingSetAll$Apps~., data=trainingSetAll)
+	results[[8]] <- c(results[[8]], predict(lts,newdata=testSetAll))	
+	methodNames[8] <- "LTS-FIT"
+
+	#Non-linear Regression
+	#TODO
+
+
+	#boxCox
+	boxCox.lin <- lm(trainingSetAll$Apps ~ trainingSetAll$Accept + trainingSetAll$Top25perc + trainingSetAll$Room.Board:trainingSetAll$Private, data=trainingSetAll)
+	b <- boxcox(boxCox.lin,plotit=FALSE)
+	best <- b$x[which(b$y==max(b$y))]
+	Apps_t <- (trainingSetAll$Apps^best-1)/best
+	boxCox.reg <- lm(Apps_t~ trainingSetAll$Accept + trainingSetAll$Top25perc + trainingSetAll$Room.Board:trainingSetAll$Private)
+	results[[9]] <- c(results[[9]], predict(boxCox.reg,newdata=testSetAll))	
+	methodNames[9] <- "Box-Cox transformation"
+
+
+	#log
+	logRegr <- glm(trainingSetAll$Apps ~ trainingSetAll$Accept + trainingSetAll$Top25perc + trainingSetAll$Room.Board:trainingSetAll$Private, data=trainingSetAll,family=gaussian(link="log"))
+	results[[10]] <- c(results[[10]], predict(logRegr,newdata=testSetAll))	
+	methodNames[10] <- "Log transformation"	
+}
+
+#Print model comparison
+for( i in 1:numberOfModels ){
+	print(methodNames[i])
+
+	if(i==6 || i==7 || i==8){ #Hier werden die modelle die auch outlier benutzen behandelt (robust regression). Ist zwar hässlich, geht aber...
+		print(rmse(predicted=results[[i]], actual=correctAll))
+		#Nicht mit anderen vergleichbar, da RMSE mit outliern natürlich höher ist, auch wenn diese für den fit nicht beachtet werden.
+		#Man kann aber auch nicht für die reduzierten folds predicten, da diese mit trainingSetAll überlappen könnten.
+	}else{
+		print(rmse(predicted=results[[i]], actual=correct))
+	}
+}
+
+#TODO: add nonlinear regression

@@ -1,0 +1,4 @@
+library(ISLR)
+#using credit card defaul dataset
+
+source("preProcessing_Magdalena.R")

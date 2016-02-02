@@ -1,0 +1,9 @@
+library(ISLR)
+#using credit card defaul dataset
+
+# Preprocess credit card data.
+source("preProcessing_Classification_Magdalena.R")
+
+source("generateCVFolds.R")
+
+source("CV.R")

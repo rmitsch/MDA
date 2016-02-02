@@ -1,0 +1,100 @@
+################
+##	MDA WS 15/16
+##	Linhardt, Mitsch, Schwarzl
+##	Exercise 3 linear regression
+################
+
+# can use data which contains cleaned version of College
+
+library(ISLR)
+source("preProcessing.R")
+
+
+data <- data_NO_outlier_training
+
+# test boxcox
+#-------------------------------------------------------------------------------
+library(MASS)
+attach(data)
+
+data.regSmall <- lm(data$Apps ~ ., data=data)
+b <- boxcox(data.regSmall)
+
+
+best = b$x[which(b$y==max(b$y))]
+
+data$Apps_t <- (data$Apps^best-1)/best
+
+data.reg <- lm(Apps_t~.,data=data)
+
+
+plot(data.reg)
+
+summary(data.reg)
+#-------------------------------------------------------------------------------
+
+
+# trying to test log -> 0 values do not work
+#-------------------------------------------------------------------------------
+#Private_01 <- (ifelse(data$Private=="Yes",1,0))
+
+#df <- data.frame((data$Accept),(data$Top25perc),data$Room.Board*Private_01,)
+#m <- data.matrix(df)
+
+#fit <- lsfit(m,data$Apps)
+#ls.print(fit)
+#-------------------------------------------------------------------------------
+
+
+# TODO University of Missouri at Rolla -> high leverage
+# use glm insteadTransformations -> family parameter
+#-------------------------------------------------------------------------------
+data <- data_NO_outlier_training
+
+
+data.reg <- glm(data$Apps ~ ., data=data,family=gaussian(link = "identity"))
+jpeg("glm_gaus_ident.jpg")
+par(mfrow=c(2,2))
+plot(data.reg)
+dev.off()
+data.reg <- glm(data$Apps ~ ., data=data,family=gaussian(link="log"))
+jpeg("glm_gaus_log.jpg")
+X11()
+par(mfrow=c(2,2))
+plot(data.reg)
+dev.off()
+data.reg <- glm(data$Apps ~ ., data=data,family=poisson(link = "log"))
+jpeg("glm_poisson_log.jpg")
+X11()
+par(mfrow=c(2,2))
+plot(data.reg)
+dev.off()
+data.reg <- glm(data$Apps ~ ., data=data,family=quasipoisson(link = "log"))
+jpeg("glm_quasipoisson_log.jpg")
+X11()
+par(mfrow=c(2,2))
+plot(data.reg)
+dev.off()
+#--------------------------------------------------------------------------------
+
+
+
+# TODO - I don't how to interpret the following 3 plots
+# plots based on Example Multiple Regression 2.r by Marcus Hudec
+hi  <- lm.influence(data.reg)$hat # diagonal values of the hat matrix
+mean(hi)
+length(hi)
+plot(hi, type="h", main="Diagonal Values of Hat-Matrix")
+abline(h=mean(hi), col="grey")
+abline(h=2*mean(hi), col="red", lty=2, lwd=2)
+abline(h=3*mean(hi), col="red", lwd=2)
+
+
+#dffits(res)
+plot(dffits(data.reg), type="h", main="DFFITS")
+abline(h=2*sqrt(length(data.reg$coef)/length(hi)), col="red", lty=2, lwd=2)
+abline(h=-2*sqrt(length(data.reg$coef)/length(hi)), col="red", lty=2, lwd=2)
+
+#cooks.distance(res)
+plot(cooks.distance(data.reg), type="h", main="Cooks Distance")
+abline(h=4/length(hi), col="red", lty=2, lwd=2)

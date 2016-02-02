@@ -1,0 +1,75 @@
+################################
+##	MDA WS 15/16
+##	Linhardt, Mitsch, Schwarzl
+##	Exercise 3 - Outlier detection
+################################
+
+library(ISLR)
+source("preProcessing_Magdalena.R")
+attach(data)
+
+
+# y <- loess(data$Apps ~ Accept + Top25perc + Room.Board*Private_01)
+
+
+
+Private_01 <- ifelse(Private=="Yes",1,0)
+
+library(locfit)
+yT <- locfit(data$Apps ~ Accept + Top25perc + Room.Board:Private_01,alpha=0.4,deg=2)
+# alpha = 0.4 -> 40% neighborhood used
+
+yHat <- predict(yT,data)
+plot(Apps,yHat)
+
+res.lsfit <- lsfit(Apps,yT)
+ls.print(res.lsfit)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+delete from here: 
+
+
+colNames  = c("Private")
+
+data = data[,!(names(data) %in% colNames)]
+
+
+######
+## TODO
+## remove this
+## would need proper way to sort the dataframe
+######
+dist = as.matrix(dist(data))
+alpha=0.4 # window size - percent of neighbors to be used
+yhat <- numeric(length(data))
+for (i in 1:length(data)){   # kernel estimate at each x
+    x0 <- data[i]
+    h <- dist[i,]#[1:length(data)*alpha]
+    yhat[i] <- weighted.mean(data$Apps, w=tricube(data, dist, h))
+    }
+
+fit <- lsfit(yhat,Apps)
+ls.print(fit)

@@ -1,0 +1,23 @@
+################################
+##	MDA WS 15/16
+##	Linhardt, Mitsch, Schwarzl
+##	Exercise 3 - Visualization
+################################
+
+library(ISLR)
+
+# Scatterplot matrix of all variables.
+X11()
+#pairs(~Private+Apps+Accept+Enroll+Top10perc+Top25perc+F.Undergrad+P.Undergrad+Outstate+
+#	Room.Board+Books+Personal+PhD+Terminal+S.F.Ratio+perc.alumni+Expend+Grad.Rate,
+#	data = data, main="Simple Scatterplot Matrix")
+plot(data)
+
+dev.new()
+
+#Histograms/barcharts of every variable. E.g. to illustrate imbalanced class.
+par(mfrow=c(2,2))
+plot(data$default, main="default")
+hist(data$income, main="income")
+hist(data$balance, main="balance")
+plot(data$student, main="student")

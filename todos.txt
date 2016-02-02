@@ -1,0 +1,20 @@
+[16:49:28] R. M.: logistic regression
+[16:49:34] R. M.: k-nn (class.)
+[16:49:49] R. M.: script für modellannahmen
+[16:51:24] R. M.: cross-validation-script
+[16:51:31] R. M.: dokumentation
+[16:55:01] R. M.: cross validation/data splitting auch für regression
+
+
+
+Besprechen So:
+
+Report 	- wer macht was? 
+				-	was geben wir alles rein?
+
+Praes		-	wer was?
+				-	wie
+
+
+Code		-	nonLinearities (TODO unten )
+				-	loess (ist komplett daneben :/ ) 

@@ -1,0 +1,49 @@
+glm_gaus_ident.jpg
+
+	(Dispersion parameter for gaussian family taken to be 21697.58)
+
+		  Null deviance: 104527230  on 458  degrees of freedom
+	Residual deviance:   9677122  on 446  degrees of freedom
+	AIC: 5900.5
+
+	Number of Fisher Scoring iterations: 2
+
+
+
+glm_gaus_log.jpg
+
+
+	(Dispersion parameter for gaussian family taken to be 39973.33)
+
+		  Null deviance: 104527230  on 458  degrees of freedom
+	Residual deviance:  17827948  on 446  degrees of freedom
+	AIC: 6180.9
+
+	Number of Fisher Scoring iterations: 6
+
+
+
+glm_poisson_log.jpg
+
+	(Dispersion parameter for poisson family taken to be 1)
+
+		  Null deviance: 113581  on 458  degrees of freedom
+	Residual deviance:  19017  on 446  degrees of freedom
+	AIC: 22955
+
+	Number of Fisher Scoring iterations: 4
+
+
+
+
+glm_quasipoisson_log.jpg
+
+
+	(Dispersion parameter for quasipoisson family taken to be 42.31159)
+
+		  Null deviance: 113581  on 458  degrees of freedom
+	Residual deviance:  19017  on 446  degrees of freedom
+	AIC: NA
+
+	Number of Fisher Scoring iterations: 4
+

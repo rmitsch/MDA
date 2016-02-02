@@ -1,0 +1,67 @@
+###
+# find unnecessary columns
+# remove unnecessary columns
+# remove outliers (>= 2000)
+# store everything in variable data 
+###
+
+
+dataOriginal <- College
+College.reg <- lm(College$Apps~., data=College)## . takes all columns not used on the left side
+summary(College.reg)
+
+# see "lm_Full.png" -> remove columns that are not significant
+
+
+colNames  = c("P.Undergrad","Books","Personal","Terminal","S.F.Ratio","perc.alumni")
+
+data = College[,!(names(College) %in% colNames)]
+
+# plot(data) # scatterplot matrix
+data.reg <- lm(data$Apps~., data=data)
+
+
+
+# observe visual: correlation of
+#	Enroll & Undergraduate
+#	Top10 & Top25
+
+
+# Test for correlation - compute R_j's by linear regression on each column
+# VIF= 1/(1-"R-sqared"^2) > 4 - multicoliniarity, error in slides?
+
+library(car)
+
+
+
+x <- as.factor(1:12)
+v <- vif(data.reg)
+plot(v, xaxt='n', type='h', xlab='',ylab='vif')
+axis(side=1, at=x, labels=names(data),las=2)
+abline(a=4,b=0, col="red")
+
+
+
+# remove Enroll (vif=21.052281)
+data = data = data[,!(names(data) %in% c("Enroll"))]
+
+data.reg <- lm(data$Apps~., data=data)
+vif(data.reg)
+# remove Top10perc (vif=6.672607)
+data = data = data[,!(names(data) %in% c("Top10perc"))]
+
+
+#remove F.Undergrad (vif=5.904212)
+data = data = data[,!(names(data) %in% c("F.Undergrad"))]
+
+data.reg <- lm(data$Apps~., data=data)
+vif(data.reg)
+
+# now all vif's are < 4
+
+
+dataAll <- data
+
+#remove outliers
+data <- data[data$Apps<2000,]
+
